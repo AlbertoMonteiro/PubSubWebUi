@@ -1,0 +1,99 @@
+﻿@using PubSubWebUi.Components.Dialogs
+@using PubSubWebUi.Components.Models
+@using PubSubWebUi.Services
+@using PubSubWebUi.Components.Blocks
+@using System.Text
+@inject IPubSubService PubSubService
+@inject ProjectContext ProjectContext
+@inject IDialogService DialogService
+@rendermode InteractiveServer
+
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentLabel Typo="Typography.H3"> Topics </FluentLabel>
+    <FluentSpacer />
+    <FluentButton IconEnd="new Icons.Regular.Size16.Add()" Title="Add new topic" @onclick="AddNewTopic" />
+</FluentStack>
+<br />
+
+@if (_topics == null)
+{
+    <FluentProgressRing />
+}
+else if (_topics is [])
+{
+    <FluentLabel Typo="Typography.Subject"> No topics in project <b>@ProjectContext.CurrentProject</b></FluentLabel>
+}
+else
+{
+    <FluentListbox Items="@_topics"
+                   OptionValue="@(i => i.Name)"
+                   @onclick="@(async () => await TopicSelected.InvokeAsync(null))"
+                   @bind-SelectedOption=@SelectedTopic
+                   ValueChanged="@((e) => HandleTopicSelect(SelectedTopic))">
+        <OptionTemplate>
+            @context.Name
+            <FluentSpacer />
+            <FluentIcon Icon="Icons.Regular.Size16.List" Slot="start" />
+        </OptionTemplate>
+    </FluentListbox>
+}
+
+@code {
+    [Parameter]
+    public Topic? SelectedTopic { get; set; }
+
+    [Parameter]
+    public EventCallback<Topic> SelectedTopicChanged { get; set; }
+
+    [Parameter]
+    public EventCallback TopicSelected { get; set; }
+
+    private List<Topic>? _topics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTopics();
+    }
+
+    private async Task LoadTopics()
+    {
+        var response = await PubSubService.GetTopicsAsync(ProjectContext.CurrentProject);
+        _topics = response.Content?.Topics?.ToList() ?? new List<Topic>();
+        StateHasChanged();
+    }
+
+    private async Task HandleTopicSelect(Topic topic)
+    {
+        try
+        {
+            await SelectedTopicChanged.InvokeAsync(SelectedTopic);
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error selecting topic: {ex}");
+        }
+    }
+
+    private async Task AddNewTopic()
+    {
+        DialogParameters parameters = new()
+        {
+            Title = "Add a subscription",
+            PrimaryAction = "Add",
+            PrimaryActionEnabled = true,
+            SecondaryAction = "Cancel",
+            Width = "500px",
+            PreventScroll = true
+        };
+
+        IDialogReference dialog = await DialogService.ShowDialogAsync<NewTopicDialog>(new NewTopic { Name = "" }, parameters);
+        DialogResult? result = await dialog.Result;
+
+        if (result.Data is NewTopic theNewTopic)
+        {
+            await PubSubService.CreateTopicAsync(ProjectContext.CurrentProject, theNewTopic!.Name);
+            await LoadTopics();
+        }
+    }
+}

@@ -1,0 +1,62 @@
+﻿@using PubSubWebUi.Services
+@inject IPubSubService PubSubService
+@inject ProjectContext ProjectContext
+
+<FluentGrid>
+    <FluentGridItem xs="12" sm="12">
+        <FluentLabel Typo="Typography.H3"> Subscription details </FluentLabel>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <FluentStack Orientation="Orientation.Vertical">
+            <FluentLabel>path: @SelectedSubscription.Name</FluentLabel>
+            <FluentLabel>topic: @SelectedSubscription.Topic</FluentLabel>
+        </FluentStack>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6">
+        <div style="display: flex;justify-content: center;">
+            <FluentButton Loading="_loadingMessages" OnClick="LoadMessages" IconStart="new Icons.Regular.Size16.ArrowDownload()" Appearance="Appearance.Accent">Pull messages</FluentButton>
+        </div>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="12">
+        Messages received: @_receivedMessages.Count()
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="12">
+        <FluentDataGrid Items="@_receivedMessages" AutoFit=true RowSize="DataGridRowSize.Medium">
+            <PropertyColumn Property="@(x => x.Message.MessageId)"/>
+            <PropertyColumn Property="@(x => x.Message.PublishTime.Value.ToLocalTime())" Title="Timestamp" />
+            <PropertyColumn Property="@(x => x.Message.DecodedData)" Style="font-family: monospace" />
+            <PropertyColumn Property="@(x => x.Message.Attributes)" />
+            <TemplateColumn Title="Ack">
+                <FluentButton Loading="_loadingMessages" OnClick="LoadMessages" IconStart="new Icons.Regular.Size12.Checkmark()" Appearance="Appearance.Accent">Ack</FluentButton>
+            </TemplateColumn>
+        </FluentDataGrid>
+    </FluentGridItem>
+</FluentGrid>
+
+@code {
+    [Parameter]
+    public Subscription? SelectedSubscription { get; set; }
+
+    private bool _loadingMessages;
+    private IQueryable<ReceivedMessage> _receivedMessages = new List<ReceivedMessage>().AsQueryable();
+
+    private async Task LoadMessages()
+    {
+        _loadingMessages = true;
+        StateHasChanged();
+
+        var response = await PubSubService.PullMessagesAsync(ProjectContext.CurrentProject, SelectedSubscription!.SubscriptionName, new());
+
+        if (response is { IsSuccessStatusCode: true, Content.ReceivedMessages: [..] msgs })
+        {
+            _receivedMessages = msgs.AsQueryable();
+        }
+        else
+        {
+            // Show error
+        }
+
+        _loadingMessages = false;
+        StateHasChanged();
+    }
+}

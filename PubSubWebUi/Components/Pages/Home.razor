@@ -1,7 +1,49 @@
 ﻿@page "/"
+@using PubSubWebUi.Components.Dialogs
+@using PubSubWebUi.Components.Models
+@using PubSubWebUi.Services
+@using PubSubWebUi.Components.Blocks
+@using System.Text
+@inject IPubSubService PubSubService
+@inject ProjectContext ProjectContext
+@inject IDialogService DialogService
+@inject IJSRuntime jsRuntime
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>PubSub Explorer</PageTitle>
+<FluentDialogProvider />
 
-<h1>Hello, world!</h1>
+<div class="content-container">
+    <FluentGrid>
+        <FluentGridItem sm="6" xs="12">
+            <TopicList @bind-SelectedTopic="SelectedTopic" TopicSelected="@(() => SelectedSubscription = null)" />
+        </FluentGridItem>
+        <FluentGridItem sm="6" xs="12">
+            <SubscriptionList SelectedTopic="SelectedTopic"
+                              @bind-SelectedSubscription="SelectedSubscription" />
+        </FluentGridItem>
+        <FluentGridItem sm="12" xs="12">
+            @if (SelectedSubscription is not null)
+            {
+                <SubscriptionDetails SelectedSubscription="SelectedSubscription" />
+            }
+            else if (SelectedTopic is not null)
+            {
+                <TopicDetails SelectedTopic="SelectedTopic" />
+            }
+        </FluentGridItem>
+    </FluentGrid>
+</div>
 
-Welcome to your new app.
+@code {
+    public Subscription? SelectedSubscription { get; set; }
+    public Topic? SelectedTopic { get; set; }
+
+    private List<Topic>? _topics;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await BlazorMonaco.Editor.Global.SetTheme(jsRuntime, "vs-dark");
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

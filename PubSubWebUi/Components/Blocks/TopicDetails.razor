@@ -1,0 +1,75 @@
+﻿@using PubSubWebUi.Components.Dialogs
+@using PubSubWebUi.Components.Models
+@using PubSubWebUi.Services
+@using PubSubWebUi.Components.Blocks
+@using System.Text
+@inject IPubSubService PubSubService
+@inject ProjectContext ProjectContext
+@rendermode InteractiveServer
+
+<FluentGrid>
+    <FluentGridItem xs="6">
+        <FluentLabel Typo="Typography.H3">
+            Publish Message to topic: @SelectedTopic.Name
+        </FluentLabel>
+    </FluentGridItem>
+    <FluentGridItem xs="3">
+        <div style="display: flex;justify-content: center;">
+            <FluentButton IconStart="new Icons.Regular.Size16.DocumentSettings()" Appearance="Appearance.Lightweight">Edit attributes (0)</FluentButton>
+        </div>
+    </FluentGridItem>
+    <FluentGridItem xs="3">
+        <div style="display: flex;justify-content: end;">
+            <FluentButton Loading="_publishingMessage" OnClick="PublishMessage" IconStart="new Icons.Regular.Size16.Send()" Appearance="Appearance.Accent">Publish message</FluentButton>
+        </div>
+    </FluentGridItem>
+    <FluentGridItem xs="12">
+        <StandaloneCodeEditor @ref="_editor" Id="my-editor-id" CssClass="my-editor-class" ConstructionOptions="@(x => new StandaloneEditorConstructionOptions() { Language = "json" })" />
+    </FluentGridItem>
+</FluentGrid>
+
+<style>
+    #my-editor-id {
+        height: 200px;
+    }
+
+    .my-editor-class {
+        height: 200px;
+    }
+
+    .monaco-editor-container {
+        height: 200px;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Topic? SelectedTopic { get; set; }
+
+    private StandaloneCodeEditor _editor;
+
+    private bool _publishingMessage;
+
+    private async Task PublishMessage()
+    {
+        _publishingMessage = true;
+        StateHasChanged();
+
+        var message = new PublishMessagesRequest([
+            new(Convert.ToBase64String(Encoding.UTF8.GetBytes(await _editor.GetValue())))
+        ]);
+        var response = await PubSubService.PublishMessageAsync(ProjectContext.CurrentProject, SelectedTopic!.TopicName, message);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await _editor.SetValue("");
+        }
+        else
+        {
+            // Show error
+        }
+
+        _publishingMessage = false;
+        StateHasChanged();
+    }
+}

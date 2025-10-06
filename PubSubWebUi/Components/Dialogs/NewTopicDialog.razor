@@ -1,0 +1,17 @@
+﻿@using PubSubWebUi.Components.Models
+@implements IDialogContentComponent<NewTopic>
+
+<FluentTextField @bind-Value="@Content.Name" style="width: 100%">Topic name:</FluentTextField>
+
+@code {
+    [Parameter]
+    public NewTopic Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    private void ToggleDialogPrimaryActionButton(bool enable)
+    {
+        Dialog!.TogglePrimaryActionButton(enable);
+    }
+}

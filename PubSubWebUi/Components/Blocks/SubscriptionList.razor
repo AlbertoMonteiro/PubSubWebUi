@@ -1,0 +1,114 @@
+﻿@using PubSubWebUi.Components.Dialogs
+@using PubSubWebUi.Components.Models
+@using PubSubWebUi.Services
+@inject IPubSubService PubSubService
+@inject ProjectContext ProjectContext
+@inject IDialogService DialogService
+
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentLabel Typo="Typography.H3"> Subscriptions </FluentLabel>
+    <FluentSpacer />
+    @if (_subscriptions is not null)
+    {
+        <FluentButton IconEnd="new Icons.Regular.Size16.Add()" Title="Add new subscription" @onclick="AddNewSubscription" />
+    }
+</FluentStack>
+<br />
+@if (_loadingSubscriptions)
+{
+    <FluentProgressRing />
+}
+else if (_subscriptions is [])
+{
+    <FluentLabel Typo="Typography.Subject"> No subscription for topic <b>@SelectedTopic.Name</b></FluentLabel>
+}
+else if (_subscriptions != null)
+{
+    <FluentListbox Items="@_subscriptions"
+                   OptionValue="@(i => i.Name)"
+                   @bind-SelectedOption="_selectedSubscriptionInternal">
+        <OptionTemplate>
+            @context.Name
+            <FluentSpacer />
+            <FluentIcon Icon="Icons.Regular.Size16.List" Slot="start" />
+        </OptionTemplate>
+    </FluentListbox>
+}
+
+@code {
+    [Parameter]
+    public Subscription? SelectedSubscription { get; set; }
+
+    [Parameter]
+    public EventCallback<Subscription?> SelectedSubscriptionChanged { get; set; }
+
+    [Parameter]
+    public Topic? SelectedTopic { get; set; }
+
+    private Topic? currentTopic;
+
+    private List<Subscription>? _subscriptions;
+    private bool _loadingSubscriptions;
+
+    private Subscription? _selectedSubscriptionInternal
+    {
+        get => SelectedSubscription;
+        set
+        {
+            if (SelectedSubscription != value)
+            {
+                SelectedSubscriptionChanged.InvokeAsync(value);
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback OnSubscriptionCreated { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubscriptionSelected { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadSubscriptions();
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task LoadSubscriptions()
+    {
+        if (currentTopic != SelectedTopic)
+        {
+            currentTopic = SelectedTopic;
+            _loadingSubscriptions = true;
+            StateHasChanged();
+
+            var response = await PubSubService.GetSubscriptionsAsync(ProjectContext.CurrentProject);
+            _subscriptions = response.Content?.Subscriptions?.Where(x => x.Topic == currentTopic.Name).ToList() ?? [];
+            _loadingSubscriptions = false;
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    private async Task AddNewSubscription()
+    {
+        DialogParameters parameters = new()
+        {
+            Title = "Add a subscription",
+            PrimaryAction = "Add",
+            PrimaryActionEnabled = true,
+            SecondaryAction = "Cancel",
+            Width = "500px",
+            PreventScroll = true
+        };
+
+        IDialogReference dialog = await DialogService.ShowDialogAsync<NewSubscriptionDialog>(new NewSubscription { Name = "" }, parameters);
+        DialogResult? result = await dialog.Result;
+
+        if (!result.Cancelled && result.Data is NewSubscription subscription)
+        {
+            var response = await PubSubService.CreateSubscriptionAsync(ProjectContext.CurrentProject, subscription.Name, new NewSubscriptionRequest(SelectedTopic.Name));
+            await OnSubscriptionCreated.InvokeAsync();
+            await LoadSubscriptions();
+        }
+    }
+}

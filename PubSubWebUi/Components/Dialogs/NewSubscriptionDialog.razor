@@ -1,0 +1,28 @@
+﻿@using PubSubWebUi.Components.Models
+@implements IDialogContentComponent<NewSubscription>
+
+<FluentTextField @bind-Value="@Content.Name" style="width: 100%">Subscription name:</FluentTextField>
+
+<FluentSwitch @bind-Value=PushSubscription Label="Push subscription" />
+
+@if (PushSubscription)
+{
+    <hr/>
+    <FluentTextField @bind-Value="@PushEndpoint" style="width: 100%">Push endpoint:</FluentTextField>
+}
+
+@code {
+    [Parameter]
+    public NewSubscription Content { get; set; } = default!;
+
+    public bool PushSubscription { get; set; }
+    public string? PushEndpoint { get; set; }
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    private void ToggleDialogPrimaryActionButton(bool enable)
+    {
+        Dialog!.TogglePrimaryActionButton(enable);
+    }
+}
