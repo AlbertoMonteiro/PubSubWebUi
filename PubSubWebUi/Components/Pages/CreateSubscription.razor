@@ -1,0 +1,85 @@
+﻿@page "/create-subscription"
+@using PubSubWebUi.Services
+@inject IPubSubService PubSubService
+
+<h3>Create Subscription</h3>
+
+<EditForm Model="@subscriptionModel" OnValidSubmit="HandleValidSubmit" FormName="createSubscriptionForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="projectId" class="form-label">Project ID</label>
+        <InputText id="projectId" class="form-control" @bind-Value="subscriptionModel.ProjectId" />
+    </div>
+    <div class="mb-3">
+        <label for="subscriptionName" class="form-label">Subscription Name</label>
+        <InputText id="subscriptionName" class="form-control" @bind-Value="subscriptionModel.SubscriptionName" />
+    </div>
+    <div class="mb-3">
+        <label for="topicName" class="form-label">Topic Name</label>
+        <InputText id="topicName" class="form-control" @bind-Value="subscriptionModel.TopicName" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Subscription</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert @alertClass mt-3">@message</div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private SubscriptionModel? subscriptionModel { get; set; }
+    private string? message;
+    private string alertClass = "alert-success";
+
+    protected override void OnInitialized() => subscriptionModel ??= new();
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            if (subscriptionModel is null)
+                return;
+
+            var response = await PubSubService.CreateSubscriptionAsync(
+                subscriptionModel.ProjectId,
+                subscriptionModel.SubscriptionName,
+                new PubSubWebUi.Services.NewSubscriptionRequest(subscriptionModel.SubscriptionName, subscriptionModel.TopicName, null)
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                message = $"Subscription '{subscriptionModel.SubscriptionName}' created successfully!";
+                alertClass = "alert-success";
+                subscriptionModel = new(); // Limpa o formulário
+            }
+            else
+            {
+                message = $"Error: {response.Error.Message}\n{response.Error.Content}";
+                alertClass = "alert-danger";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+            alertClass = "alert-danger";
+        }
+    }
+
+    public class SubscriptionModel
+    {
+        [EditorRequired]
+        public string ProjectId { get; set; } = string.Empty;
+        [EditorRequired]
+        public string SubscriptionName { get; set; } = string.Empty;
+        [EditorRequired]
+        public string TopicName { get; set; } = string.Empty;
+    }
+
+    public class NewSubscriptionRequest
+    {
+        public string Topic { get; set; } = string.Empty;
+    }
+}

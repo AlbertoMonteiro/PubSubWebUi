@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PubSubWebUi.AppHost/PubSubWebUi.AppHost.csproj" />
+  <Project Path="PubSubWebUi.ServiceDefaults/PubSubWebUi.ServiceDefaults.csproj" />
+  <Project Path="PubSubWebUi/PubSubWebUi.csproj" />
+</Solution>

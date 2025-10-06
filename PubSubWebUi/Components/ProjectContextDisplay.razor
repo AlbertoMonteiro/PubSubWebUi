@@ -1,0 +1,25 @@
+@using PubSubWebUi.Services
+@inject ProjectContext ProjectContext
+
+<div class="project-context">
+    <label for="projectId">Project ID:</label>
+    <input type="text" id="projectId" @bind="ProjectContext.CurrentProject" @bind:event="oninput" />
+</div>
+
+<style>
+    .project-context {
+        padding: 8px 16px;
+        background-color: #f3f4f6;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .project-context input {
+        padding: 4px 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        min-width: 200px;
+    }
+</style>

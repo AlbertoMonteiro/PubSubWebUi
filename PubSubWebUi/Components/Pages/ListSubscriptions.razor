@@ -1,0 +1,98 @@
+@page "/list-subscriptions"
+@using PubSubWebUi.Services
+@inject IPubSubService PubSubService
+
+<h3>Topic Subscriptions</h3>
+
+<EditForm Model="@searchModel" OnValidSubmit="HandleSearch" FormName="searchSubscriptionsForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="projectId" class="form-label">Project ID</label>
+        <InputText id="projectId" class="form-control" @bind-Value="searchModel.ProjectId" />
+    </div>
+    <div class="mb-3">
+        <label for="topicName" class="form-label">Topic Name</label>
+        <InputText id="topicName" class="form-control" @bind-Value="searchModel.TopicName" />
+    </div>
+    <button type="submit" class="btn btn-primary">Search Subscriptions</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert @alertClass mt-3">@message</div>
+}
+
+@if (subscriptions != null && subscriptions.Any())
+{
+    <div class="mt-4">
+        <h4>Subscriptions for Topic: @searchModel?.TopicName</h4>
+        <div class="list-group">
+            @foreach (var subscription in subscriptions)
+            {
+                <div class="list-group-item">
+                    @subscription
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private SearchModel? searchModel { get; set; }
+    private string? message;
+    private string alertClass = "alert-success";
+    private IEnumerable<string>? subscriptions;
+
+    protected override void OnInitialized() => searchModel ??= new();
+
+    private async Task HandleSearch()
+    {
+        try
+        {
+            if (searchModel is null)
+                return;
+
+            var response = await PubSubService.GetSubscriptionsAsync(
+                searchModel.ProjectId,
+                searchModel.TopicName
+            );
+
+            if (response.IsSuccessStatusCode && response.Content != null)
+            {
+                subscriptions = response.Content.Subscriptions;
+                if (!subscriptions.Any())
+                {
+                    message = "No subscriptions found for this topic.";
+                    alertClass = "alert-info";
+                }
+                else
+                {
+                    message = null;
+                }
+            }
+            else
+            {
+                message = $"Error: {response.Error.Message}\n{response.Error.Content}";
+                alertClass = "alert-danger";
+                subscriptions = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+            alertClass = "alert-danger";
+            subscriptions = null;
+        }
+    }
+
+    public class SearchModel
+    {
+        [EditorRequired]
+        public string ProjectId { get; set; } = string.Empty;
+        [EditorRequired]
+        public string TopicName { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,60 @@
+﻿@page "/topics"
+@using PubSubWebUi.Services
+@inject IPubSubService PubSubService
+@attribute [StreamRendering]
+
+<PageTitle>Topics</PageTitle>
+
+<h1>Topics</h1>
+
+<p>This component demonstrates showing data.</p>
+
+@if (topics == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (topics is [])
+{
+    <p><em>No topic found</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var topic in topics)
+            {
+                <tr>
+                    <td>@topic.ProjectId</td>
+                    <td>@topic.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private TopicItem[]? topics;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var topicsResponse = await PubSubService.GetTopicsAsync("test-project");
+
+        if (topicsResponse.IsSuccessStatusCode)
+        {
+            topics = topicsResponse.Content?.Topics?.Select(x =>
+            {
+                if (x.Name.Split('/') is [_, { } projectId, _, { } topicName])
+                    return new TopicItem(projectId, topicName);
+                return new TopicItem("", "");
+            }).ToArray() ?? [];
+        }
+    }
+
+    public record TopicItem(string ProjectId, string Name);
+}
