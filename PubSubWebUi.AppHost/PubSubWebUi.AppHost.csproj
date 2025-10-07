@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PubSubWebUi.Aspire.Hosting\PubSubWebUi.Aspire.Hosting.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\PubSubWebUi\PubSubWebUi.csproj" />
   </ItemGroup>
 

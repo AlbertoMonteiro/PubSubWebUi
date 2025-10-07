@@ -2,8 +2,7 @@ const string PUBSUB_VAR = "PUBSUB_EMULATOR_HOST";
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var pubsubEmulator = builder.AddContainer("pubsub-emulator", "messagebird/gcloud-pubsub-emulator", "latest")
-    .WithHttpEndpoint(8681, 8681, "pubsub-api")
+var pubsubEmulator = builder.AddPubSubEmulator("pubsub-emulator")
     .WithLifetime(ContainerLifetime.Persistent);
 
 builder.AddContainer($"pubsub-ui", "ghcr.io/neoscript/pubsub-emulator-ui", "latest")

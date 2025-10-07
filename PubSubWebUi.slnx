@@ -1,8 +1,9 @@
 <Solution>
-  <Project Path="PubSubWebUi/PubSubWebUi.csproj" />
   <Folder Name="/Solution Items/">
     <File Path="README.md" />
   </Folder>
   <Project Path="PubSubWebUi.AppHost/PubSubWebUi.AppHost.csproj" />
+  <Project Path="PubSubWebUi.Aspire.Hosting/PubSubWebUi.Aspire.Hosting.csproj" Id="be3d9170-6993-45bd-8489-702103e4a3ee" />
   <Project Path="PubSubWebUi.ServiceDefaults/PubSubWebUi.ServiceDefaults.csproj" />
+  <Project Path="PubSubWebUi/PubSubWebUi.csproj" />
 </Solution>
