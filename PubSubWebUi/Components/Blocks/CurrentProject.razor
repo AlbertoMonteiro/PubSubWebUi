@@ -1,0 +1,27 @@
+﻿@using PubSubWebUi.Services
+@inject ProjectContext ctx
+@rendermode InteractiveServer
+
+<div style="margin-left: auto;">
+    Current project: @ctx.CurrentProject
+</div>
+
+@code {
+    private bool _subscribed = false;
+    protected override void OnInitialized()
+    {
+        if (!_subscribed)
+        {
+            ctx.PropertyChanged += OnPropertyChanged;
+            _subscribed = true;
+        }
+    }
+
+    private void OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ProjectContext.CurrentProject))
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+}

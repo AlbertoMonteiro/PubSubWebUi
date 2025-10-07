@@ -1,0 +1,22 @@
+﻿@using PubSubWebUi.Components.Models
+@implements IDialogContentComponent<NewProjectDialog.DialogData>
+
+<FluentTextField @bind-Value="Content.ProjectName" style="width: 100%">Project name:</FluentTextField>
+
+@code {
+    [Parameter]
+    public NewProjectDialog.DialogData Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    private void ToggleDialogPrimaryActionButton(bool enable)
+    {
+        Dialog!.TogglePrimaryActionButton(enable);
+    }
+
+    public class DialogData
+    {
+        public string ProjectName { get; set; } = "";
+    }
+}

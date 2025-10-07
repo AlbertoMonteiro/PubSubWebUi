@@ -1,0 +1,58 @@
+﻿@page "/projects"
+@using PubSubWebUi.Components.Dialogs
+@using PubSubWebUi.Components.Layout
+@using PubSubWebUi.Services
+@inject ProjectContext ctx
+@inject IDialogService DialogService
+@rendermode InteractiveServer
+
+<FluentDialogProvider />
+<FluentLabel Typo="Typography.H3"> Projects </FluentLabel>
+
+<FluentStack>
+    @foreach (var item in ctx.AvailableProjects)
+    {
+        <FluentCard Width="400px" MinimalStyle=true Style="display: flex;justify-content: center;cursor: pointer" @onclick="@(() => SelectedProject(item))">
+            <FluentLabel Typo="Typography.EmailHeader"> @item </FluentLabel>
+        </FluentCard>
+    }
+
+    <FluentCard Width="400px" MinimalStyle=true Style="cursor: pointer" @onclick="@(() => AddNewProject())">
+        <div style="display: flex;justify-content: center;">
+            <FluentButton IconStart="@(new Icons.Regular.Size24.Add())" OnClick="AddNewProject" />
+        </div>
+        <div style="display: flex;justify-content: center;">
+            <FluentLabel Typo="Typography.H4"> Attach new project </FluentLabel>
+        </div>
+    </FluentCard>
+</FluentStack>
+
+@code {
+    public void SelectedProject(string project)
+    {
+        ctx.CurrentProject = project;
+        StateHasChanged();
+    }
+
+    public async Task AddNewProject()
+    {
+        DialogParameters parameters = new()
+        {
+            Title = "Add a project",
+            PrimaryAction = "Add",
+            PrimaryActionEnabled = true,
+            SecondaryAction = "Cancel",
+            Width = "500px",
+            PreventScroll = true,
+            Modal = true
+        };
+
+        IDialogReference dialog = await DialogService.ShowDialogAsync<NewProjectDialog>(new NewProjectDialog.DialogData(), parameters);
+        DialogResult? result = await dialog.Result;
+
+        if (!result.Cancelled && result.Data is NewProjectDialog.DialogData { ProjectName: { } project })
+        {
+            ctx.AddProject(project);
+        }
+    }
+}

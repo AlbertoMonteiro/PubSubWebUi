@@ -1,23 +1,42 @@
-using System;
+using System.ComponentModel;
 
 namespace PubSubWebUi.Services;
 
-public class ProjectContext
+public class ProjectContext : INotifyPropertyChanged
 {
-    public event Action? OnProjectChange;
-    
-    private string _currentProject = "test-project";
-    
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private readonly IList<string> _availableProjects;
+
+    public ProjectContext(IConfiguration configuration)
+    {
+        var projectIds = configuration.GetValue<string>("GCP_PROJECT_IDS");
+        _availableProjects = projectIds?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList() ?? ["test-project"];
+
+        CurrentProject = _availableProjects[0];
+    }
+
     public string CurrentProject
     {
-        get => _currentProject;
+        get;
         set
         {
-            if (_currentProject != value)
+            if (field != value)
             {
-                _currentProject = value;
-                OnProjectChange?.Invoke();
+                field = value;
+                PropertyChanged?.Invoke(this, new(nameof(CurrentProject)));
             }
+        }
+    }
+
+    public IReadOnlyCollection<string> AvailableProjects => _availableProjects.ToList().AsReadOnly();
+
+    public void AddProject(string projectId)
+    {
+        if (!_availableProjects.Contains(projectId))
+        {
+            _availableProjects.Add(projectId);
         }
     }
 }
