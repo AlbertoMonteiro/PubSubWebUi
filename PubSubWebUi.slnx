@@ -1,5 +1,8 @@
 <Solution>
   <Project Path="PubSubWebUi/PubSubWebUi.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="PubSubWebUi.AppHost/PubSubWebUi.AppHost.csproj" />
   <Project Path="PubSubWebUi.ServiceDefaults/PubSubWebUi.ServiceDefaults.csproj" />
 </Solution>
