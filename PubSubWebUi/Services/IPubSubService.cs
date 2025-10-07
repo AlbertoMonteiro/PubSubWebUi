@@ -13,16 +13,16 @@ public interface IPubSubService
     Task<ApiResponse<TopicResponse>> GetTopicsAsync(string projectId);
 
     [Put("/v1/projects/{projectId}/topics/{topicName}")]
-    Task<ApiResponse<HttpResponse>> CreateTopicAsync(string projectId, string topicName);
+    Task<ApiResponse<HttpResponseMessage>> CreateTopicAsync(string projectId, string topicName);
 
     [Put("/v1/projects/{projectId}/subscriptions/{subscriptionName}")]
-    Task<ApiResponse<HttpResponse>> CreateSubscriptionAsync(string projectId, string subscriptionName, [Body] NewSubscriptionRequest request);
+    Task<ApiResponse<HttpResponseMessage>> CreateSubscriptionAsync(string projectId, string subscriptionName, [Body] NewSubscriptionRequest request);
 
     [Get("/v1/projects/{projectId}/subscriptions")]
     Task<ApiResponse<SubscriptionResponse>> GetSubscriptionsAsync(string projectId);
 
     [Post("/v1/projects/{projectId}/topics/{topicName}:publish")]
-    Task<ApiResponse<HttpResponse>> PublishMessageAsync(string projectId, string topicName, [Body] PublishMessagesRequest messages);
+    Task<ApiResponse<HttpResponseMessage>> PublishMessageAsync(string projectId, string topicName, [Body] PublishMessagesRequest messages);
 
     [Post("/v1/projects/{projectId}/subscriptions/{subscriptionName}:pull")]
     Task<ApiResponse<PullMessagesResponse>> PullMessagesAsync(string projectId, string subscriptionName, [Body] PullMessagesRequest request);

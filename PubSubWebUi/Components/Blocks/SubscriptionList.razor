@@ -26,7 +26,7 @@ else if (_subscriptions != null)
 {
     <FluentListbox Items="@_subscriptions"
                    OptionValue="@(i => i.Name)"
-                   @bind-SelectedOption="_selectedSubscriptionInternal">
+                   @bind-SelectedOption="SelectedSubscription">
         <OptionTemplate>
             @context.Name
             <FluentSpacer />
@@ -37,7 +37,18 @@ else if (_subscriptions != null)
 
 @code {
     [Parameter]
-    public Subscription? SelectedSubscription { get; set; }
+    public Subscription? SelectedSubscription
+    { 
+        get;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                SelectedSubscriptionChanged.InvokeAsync(field);
+            }
+        }
+    }
 
     [Parameter]
     public EventCallback<Subscription?> SelectedSubscriptionChanged { get; set; }
@@ -45,50 +56,33 @@ else if (_subscriptions != null)
     [Parameter]
     public Topic? SelectedTopic { get; set; }
 
-    private Topic? currentTopic;
-
-    private List<Subscription>? _subscriptions;
-    private bool _loadingSubscriptions;
-
-    private Subscription? _selectedSubscriptionInternal
-    {
-        get => SelectedSubscription;
-        set
-        {
-            if (SelectedSubscription != value)
-            {
-                SelectedSubscriptionChanged.InvokeAsync(value);
-            }
-        }
-    }
-
-    [Parameter]
-    public EventCallback OnSubscriptionCreated { get; set; }
-
     [Parameter]
     public EventCallback OnSubscriptionSelected { get; set; }
 
+    private Topic? currentTopic;
+    private List<Subscription>? _subscriptions;
+    private bool _loadingSubscriptions;
+
     protected override async Task OnParametersSetAsync()
     {
-        await LoadSubscriptions();
+        if (currentTopic != SelectedTopic)
+            await LoadSubscriptions();
         await base.OnParametersSetAsync();
     }
 
     private async Task LoadSubscriptions()
     {
-        if (currentTopic != SelectedTopic)
-        {
-            currentTopic = SelectedTopic;
-            _loadingSubscriptions = true;
-            StateHasChanged();
+        currentTopic = SelectedTopic;
+        _loadingSubscriptions = true;
+        StateHasChanged();
 
-            var response = await PubSubService.GetSubscriptionsAsync(ProjectContext.CurrentProject);
-            _subscriptions = response.Content?.Subscriptions?.Where(x => x.Topic == currentTopic.Name).ToList() ?? [];
-            _loadingSubscriptions = false;
+        var response = await PubSubService.GetSubscriptionsAsync(ProjectContext.CurrentProject);
+        _subscriptions = response.Content?.Subscriptions?.Where(x => x.Topic == currentTopic.Name).ToList() ?? [];
+        _loadingSubscriptions = false;
 
-            await InvokeAsync(StateHasChanged);
-        }
+        await InvokeAsync(StateHasChanged);
     }
+
     private async Task AddNewSubscription()
     {
         DialogParameters parameters = new()
@@ -107,7 +101,6 @@ else if (_subscriptions != null)
         if (!result.Cancelled && result.Data is NewSubscription subscription)
         {
             var response = await PubSubService.CreateSubscriptionAsync(ProjectContext.CurrentProject, subscription.Name, new NewSubscriptionRequest(SelectedTopic.Name));
-            await OnSubscriptionCreated.InvokeAsync();
             await LoadSubscriptions();
         }
     }
