@@ -43,6 +43,24 @@ The solution consists of three main projects:
 - 📦 .NET 10 SDK
 - 🌐 A modern web browser
 - 🔧 Your preferred IDE (Visual Studio 2022+ recommended)
+- 🔌 Google Cloud Pub/Sub Emulator
+
+### Configuration
+
+The application connects to a Google Cloud Pub/Sub emulator by default at `http://localhost:8681/`. If your emulator is running on a different address, you can configure it using the environment variable:
+
+```bash
+# Windows
+set PUBSUB_EMULATOR_HOST=http://your-emulator-host:port/
+
+# Linux/macOS
+export PUBSUB_EMULATOR_HOST=http://your-emulator-host:port/
+```
+
+For Docker:
+```bash
+docker run -e PUBSUB_EMULATOR_HOST=http://your-emulator-host:port/ pubsubwebui
+```
 
 ### Running the Application
 

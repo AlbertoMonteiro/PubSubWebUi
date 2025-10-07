@@ -5,6 +5,10 @@ using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var emulatorHost = builder.Configuration["PUBSUB_EMULATOR_HOST"] is { } url
+    ? new Uri(url)
+    : new Uri("http://localhost:8681/");
+
 builder.AddServiceDefaults();
 
 // Add services to the container.
@@ -18,7 +22,7 @@ builder.Services.AddFluentUIComponents();
 builder.Services.AddSingleton<ProjectContext>();
 
 builder.Services.AddRefitClient<IPubSubService>()
-    .ConfigureHttpClient(client => client.BaseAddress = new Uri(builder.Configuration["services:pubsub-emulator:pubsub-api:0"]!));
+    .ConfigureHttpClient(client => client.BaseAddress = emulatorHost);
 
 var app = builder.Build();
 
@@ -40,3 +44,4 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+return 0;

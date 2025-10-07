@@ -15,6 +15,6 @@ builder.AddContainer($"pubsub-ui", "ghcr.io/neoscript/pubsub-emulator-ui", "late
 
 builder.AddProject<Projects.PubSubWebUi>("pubsubwebui")
     .WaitFor(pubsubEmulator)
-    .WithReference(pubsubEmulator.GetEndpoint("pubsub-api"));
+    .WithEnvironment(PUBSUB_VAR, pubsubEmulator.GetEndpoint("pubsub-api"));
 
 builder.Build().Run();
