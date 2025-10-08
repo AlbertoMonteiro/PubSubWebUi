@@ -30,7 +30,8 @@ else if (_subscriptions != null)
         <OptionTemplate>
             @context.Name
             <FluentSpacer />
-            <FluentIcon Icon="Icons.Regular.Size16.List" Slot="start" />
+            <FluentIcon Icon="Icons.Regular.Size16.MailMultiple" Slot="start" />
+            <FluentIcon Icon="Icons.Regular.Size16.Delete" Slot="end" Title="Delete subscription" OnClick="@(() => DeleteSubscription(context))"/>
         </OptionTemplate>
     </FluentListbox>
 }
@@ -81,6 +82,16 @@ else if (_subscriptions != null)
         _loadingSubscriptions = false;
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DeleteSubscription(Subscription subscription)
+    {
+        var response = await PubSubService.DeleteSubscriptionAsync(ProjectContext.CurrentProject, subscription.SubscriptionName);
+        if (response.IsSuccessful)
+        {
+            var dialog = await DialogService.ShowSuccessAsync($"The subscription {subscription.SubscriptionName} is deleted");
+            await LoadSubscriptions();
+        }
     }
 
     private async Task AddNewSubscription()

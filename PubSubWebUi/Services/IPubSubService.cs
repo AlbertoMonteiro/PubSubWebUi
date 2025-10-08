@@ -30,10 +30,10 @@ public interface IPubSubService
     Task<ApiResponse<HttpResponseMessage>> AckMessagesAsync(string projectId, string subscriptionName, [Body] AcksMessagesRequest request);
 
     [Delete("/v1/projects/{projectId}/topics/{topicName}")]
-    Task DeleteTopicAsync(string projectId, string topicName);
+    Task<ApiResponse<HttpResponseMessage>> DeleteTopicAsync(string projectId, string topicName);
 
     [Delete("/v1/projects/{projectId}/subscriptions/{subscriptionName}")]
-    Task DeleteSubscriptionAsync(string projectId, string subscriptionName);
+    Task<ApiResponse<HttpResponseMessage>>  DeleteSubscriptionAsync(string projectId, string subscriptionName);
 }
 
 public record TopicResponse(Topic[] Topics);
