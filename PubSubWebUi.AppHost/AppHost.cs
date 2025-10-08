@@ -16,4 +16,6 @@ builder.AddProject<Projects.PubSubWebUi>("pubsubwebui")
     .WaitFor(pubsubEmulator)
     .WithEnvironment(PUBSUB_VAR, pubsubEmulator.GetEndpoint("pubsub-api"));
 
+builder.AddProject<Projects.PubSubWebUi_PlaygroundApi>("playground");
+
 builder.Build().Run();

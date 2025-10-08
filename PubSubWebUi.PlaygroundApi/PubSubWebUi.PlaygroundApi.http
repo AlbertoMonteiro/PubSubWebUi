@@ -1,0 +1,6 @@
+@PubSubWebUi.PlaygroundApi_HostAddress = http://localhost:5022
+
+GET {{PubSubWebUi.PlaygroundApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
