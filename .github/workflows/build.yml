@@ -31,10 +31,10 @@ jobs:
         run: dotnet restore
     
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build ./PubSubWebUi.Aspire.Hosting/PubSubWebUi.Aspire.Hosting.csproj -c Release --no-restore
     
       - name: Pack
-        run: dotnet pack --configuration Release --no-build --output artifacts/
+        run: dotnet pack ./PubSubWebUi.Aspire.Hosting/PubSubWebUi.Aspire.Hosting.csproj -c Release  --no-build --output artifacts/
     
       - name: NuGet login (OIDC → temp API key)
         uses: NuGet/login@v1
