@@ -4,10 +4,8 @@ WORKDIR /src
 # Copy csproj files and restore dependencies
 COPY ["PubSubWebUi/PubSubWebUi.csproj", "PubSubWebUi/"]
 COPY ["PubSubWebUi.ServiceDefaults/PubSubWebUi.ServiceDefaults.csproj", "PubSubWebUi.ServiceDefaults/"]
-COPY ["PubSubWebUi.AppHost/PubSubWebUi.AppHost.csproj", "PubSubWebUi.AppHost/"]
 RUN dotnet restore "PubSubWebUi/PubSubWebUi.csproj"
 RUN dotnet restore "PubSubWebUi.ServiceDefaults/PubSubWebUi.ServiceDefaults.csproj"
-RUN dotnet restore "PubSubWebUi.AppHost/PubSubWebUi.AppHost.csproj"
 
 # Copy everything else and build
 COPY . .
