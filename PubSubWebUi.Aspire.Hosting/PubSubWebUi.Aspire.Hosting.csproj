@@ -5,6 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>A .NET Aspire integration for hosting Google Cloud PubSub Emulator.</Description>
+    <Authors>Alberto Monteiro</Authors>
+    <Copyright>Copyright © 2025 Alberto Monteiro</Copyright>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>aspire;integration;hosting;pubsub</PackageTags>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -33,6 +37,7 @@
 
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
