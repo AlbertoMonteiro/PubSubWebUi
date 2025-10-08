@@ -32,7 +32,7 @@
             <PropertyColumn Property="@(x => x.Message.DecodedData)" Style="font-family: monospace" />
             <PropertyColumn Property="@(x => x.Message.Attributes)" />
             <TemplateColumn Title="Ack">
-                <FluentButton Loading="_loadingMessages" OnClick="LoadMessages" IconStart="new Icons.Regular.Size12.Checkmark()" Appearance="Appearance.Accent">Ack</FluentButton>
+                <FluentButton Loading="@context.IsAcking" OnClick="@(() => AckMessage(context))" IconStart="new Icons.Regular.Size12.Checkmark()" Appearance="Appearance.Accent">Ack</FluentButton>
             </TemplateColumn>
         </FluentDataGrid>
     </FluentGridItem>
@@ -64,4 +64,21 @@
         _loadingMessages = false;
         StateHasChanged();
     }
+
+    private async Task AckMessage(ReceivedMessage message)
+    {
+        message.IsAcking = true;
+        StateHasChanged();
+        var response = await PubSubService.AckMessagesAsync(ProjectContext.CurrentProject, SelectedSubscription!.SubscriptionName, new([message.AckId]));
+        if (response.IsSuccessStatusCode)
+        {
+            _receivedMessages = _receivedMessages.Where(x => x.AckId != message.AckId);
+        }
+        else
+        {
+            // Show error
+        }
+        _loadingMessages = false;
+        StateHasChanged();
+	}
 }

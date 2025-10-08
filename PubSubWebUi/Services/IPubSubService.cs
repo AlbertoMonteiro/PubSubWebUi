@@ -1,5 +1,4 @@
 ﻿using Refit;
-using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
 using Attributes = System.Collections.Generic.Dictionary<string, string>;
@@ -27,17 +26,25 @@ public interface IPubSubService
     [Post("/v1/projects/{projectId}/subscriptions/{subscriptionName}:pull")]
     Task<ApiResponse<PullMessagesResponse>> PullMessagesAsync(string projectId, string subscriptionName, [Body] PullMessagesRequest request);
 
-    Task DeleteTopicAsync(string topicName);
-    Task DeleteSubscriptionAsync(string subscriptionName);
+    [Post("/v1/projects/{projectId}/subscriptions/{subscriptionName}:acknowledge")]
+    Task<ApiResponse<HttpResponseMessage>> AckMessagesAsync(string projectId, string subscriptionName, [Body] AcksMessagesRequest request);
+
+    [Delete("/v1/projects/{projectId}/topics/{topicName}")]
+    Task DeleteTopicAsync(string projectId, string topicName);
+
+    [Delete("/v1/projects/{projectId}/subscriptions/{subscriptionName}")]
+    Task DeleteSubscriptionAsync(string projectId, string subscriptionName);
 }
 
 public record TopicResponse(Topic[] Topics);
+
 public record Topic(string Name, Attributes Labels)
 {
     public string TopicName => Name.Split('/')[^1];
 }
 
 public record NewSubscriptionRequest(string Topic, PushConfig? PushConfig = null);
+
 public record PushConfig(string PushEndpoint, Attributes? Attributes = null);
 
 public record SubscriptionResponse(Subscription[] Subscriptions);
@@ -65,4 +72,10 @@ public record PullMessagesRequest(bool ReturnImmediately = true, int MaxMessages
 
 public record PullMessagesResponse(ReceivedMessage[] ReceivedMessages);
 
-public record ReceivedMessage(string AckId, PubSubMessage Message);
+public record ReceivedMessage(string AckId, PubSubMessage Message)
+{
+    [JsonIgnore]
+    public bool IsAcking { get; set; }
+}
+
+public record AcksMessagesRequest(string[] AckIds);
