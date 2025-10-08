@@ -26,13 +26,22 @@ public static class PubSubEmulatorExtensions
     /// <summary>
     /// Configures the host port that the Pub/Sub emulator resource is exposed on instead of using randomly assigned port.
     /// </summary>
-    /// <param name="builder">The resource builder.</param>
+    /// <param name="builder">The <see cref="IDistributedApplicationBuilder"/>.</param>
     /// <param name="port">The port to bind on the host. If <see langword="null"/> is used random port will be assigned.</param>
-    /// <returns>The resource builder.</returns>
+    /// <returns>A reference to the <see cref="IResourceBuilder{T}"/>.</returns>
     public static IResourceBuilder<PubSubEmulatorResource> WithHostPort(this IResourceBuilder<PubSubEmulatorResource> builder, int? port)
-    {
-        return builder.WithEndpoint(PubSubEmulatorResource.PubSubEndpointName, endpoint => endpoint.Port = port);
-    }
+        => builder.WithEndpoint(PubSubEmulatorResource.PubSubEndpointName, endpoint => endpoint.Port = port);
+
+    /// <summary>
+    /// Configures the specified resource to use the specified Pub/Sub emulator resource by setting the appropriate environment variable.
+    /// </summary>
+    /// <typeparam name="T">The type of resource to configure.</typeparam>
+    /// <param name="builder">The <see cref="IDistributedApplicationBuilder"/>.</param>
+    /// <param name="pubsubEmulator">The Pub/Sub emulator resource to connect to.</param>
+    /// <returns>A reference to the <see cref="IResourceBuilder{T}"/>.</returns>
+    public static IResourceBuilder<T> WithEnvironment<T>(this IResourceBuilder<T> builder, IResourceBuilder<PubSubEmulatorResource> pubsubEmulator)
+        where T : IResourceWithEnvironment
+        => builder.WithEnvironment(PUBSUB_VAR, pubsubEmulator.Resource.Host);
 
     /// <summary>
     /// Adds a Pub/Sub Web UI container to the application model and configures it to connect to the specified Pub/Sub emulator resource.
@@ -49,7 +58,7 @@ public static class PubSubEmulatorExtensions
                 .WithEndpoint(8080, targetPort: 8080, name: "pubsub-web-ui", scheme: "http")
                 .WithLifetime(ContainerLifetime.Persistent)
                 .WithEnvironment("GCP_PROJECT_IDS", projectsIds)
-                .WithEnvironment(PUBSUB_VAR, builder.Resource.Host);
+                .WithEnvironment(PUBSUB_VAR, builder.Resource.Endpoint);
 
         if (configurer is not null)
         {

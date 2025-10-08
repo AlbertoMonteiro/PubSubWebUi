@@ -8,4 +8,6 @@ public class PubSubEmulatorResource(string name, string? entrypoint = null)
     public const string PubSubEndpointName = "pubsub-api";
 
     public EndpointReferenceExpression Host => this.GetEndpoint(PubSubEndpointName).Property(EndpointProperty.HostAndPort);
+
+    public EndpointReference Endpoint => this.GetEndpoint(PubSubEndpointName);
 }
