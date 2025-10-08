@@ -55,7 +55,7 @@ docker run -d --name pubsub-webui \
 
 Access the Web UI at: `http://localhost:8080`
 
-### Option 2: Docker Compose (Recommended)
+### Option 2: Docker Compose
 
 Create a `docker-compose.yml` file:
 
