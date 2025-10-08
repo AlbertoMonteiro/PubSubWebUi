@@ -3,12 +3,12 @@
 
 <FluentTextField @bind-Value="@Content.Name" style="width: 100%">Subscription name:</FluentTextField>
 
-<FluentSwitch @bind-Value=PushSubscription Label="Push subscription" />
+<FluentSwitch @bind-Value="PushSubscription" Label="Push subscription" />
 
 @if (PushSubscription)
 {
     <hr/>
-    <FluentTextField @bind-Value="@PushEndpoint" style="width: 100%">Push endpoint:</FluentTextField>
+    <FluentTextField @bind-Value="@Content.PushEndpoint" style="width: 100%">Push endpoint:</FluentTextField>
 }
 
 @code {

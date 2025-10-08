@@ -10,6 +10,11 @@
         <FluentStack Orientation="Orientation.Vertical">
             <FluentLabel>path: @SelectedSubscription.Name</FluentLabel>
             <FluentLabel>topic: @SelectedSubscription.Topic</FluentLabel>
+            <FluentLabel>type: @(SelectedSubscription.PushConfig is null ? "PULL" : "PUSH")</FluentLabel>
+            @if(SelectedSubscription.PushConfig is not null)
+            {
+                <FluentLabel>push endpoint: @SelectedSubscription.PushConfig.PushEndpoint</FluentLabel>
+            }
         </FluentStack>
     </FluentGridItem>
     <FluentGridItem xs="12" sm="6">

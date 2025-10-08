@@ -38,7 +38,7 @@ public record Topic(string Name, Attributes Labels)
 }
 
 public record NewSubscriptionRequest(string Topic, PushConfig? PushConfig = null);
-public record PushConfig(string PushEndpoint, Attributes? Attributes);
+public record PushConfig(string PushEndpoint, Attributes? Attributes = null);
 
 public record SubscriptionResponse(Subscription[] Subscriptions);
 
@@ -47,7 +47,7 @@ public record Subscription(string Name, string Topic, Pushconfig? PushConfig, in
     public string SubscriptionName => Name.Split('/')[^1];
 }
 
-public record Pushconfig();
+public record Pushconfig(string PushEndpoint);
 
 public record PublishMessagesRequest(PubSubMessage[] Messages);
 

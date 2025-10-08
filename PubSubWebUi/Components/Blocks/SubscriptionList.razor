@@ -54,7 +54,7 @@ else if (_subscriptions != null)
     public EventCallback<Subscription?> SelectedSubscriptionChanged { get; set; }
 
     [Parameter]
-    public Topic? SelectedTopic { get; set; }
+    public required Topic SelectedTopic { get; set; }
 
     [Parameter]
     public EventCallback OnSubscriptionSelected { get; set; }
@@ -100,7 +100,11 @@ else if (_subscriptions != null)
 
         if (!result.Cancelled && result.Data is NewSubscription subscription)
         {
-            var response = await PubSubService.CreateSubscriptionAsync(ProjectContext.CurrentProject, subscription.Name, new NewSubscriptionRequest(SelectedTopic.Name));
+            var request = string.IsNullOrWhiteSpace(subscription.PushEndpoint)
+                ? new NewSubscriptionRequest(SelectedTopic.Name)
+                : new NewSubscriptionRequest(SelectedTopic.Name, new(subscription.PushEndpoint));
+
+            var response = await PubSubService.CreateSubscriptionAsync(ProjectContext.CurrentProject, subscription.Name, request);
             await LoadSubscriptions();
         }
     }
