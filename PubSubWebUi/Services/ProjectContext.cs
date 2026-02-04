@@ -6,7 +6,7 @@ public class ProjectContext : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private readonly IList<string> _availableProjects;
+    private readonly List<string> _availableProjects;
 
     public ProjectContext(IConfiguration configuration)
     {

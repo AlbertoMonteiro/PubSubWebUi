@@ -33,7 +33,7 @@ public interface IPubSubService
     Task<ApiResponse<HttpResponseMessage>> DeleteTopicAsync(string projectId, string topicName);
 
     [Delete("/v1/projects/{projectId}/subscriptions/{subscriptionName}")]
-    Task<ApiResponse<HttpResponseMessage>>  DeleteSubscriptionAsync(string projectId, string subscriptionName);
+    Task<ApiResponse<HttpResponseMessage>> DeleteSubscriptionAsync(string projectId, string subscriptionName);
 }
 
 public record TopicResponse(Topic[] Topics);
