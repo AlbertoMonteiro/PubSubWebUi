@@ -5,9 +5,7 @@ using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var emulatorHost = builder.Configuration["PUBSUB_EMULATOR_HOST"] is { } url
-    ? new Uri(url)
-    : new Uri("http://localhost:8681/");
+var emulatorHost = new Uri("http://localhost:8681/");
 
 builder.AddServiceDefaults();
 

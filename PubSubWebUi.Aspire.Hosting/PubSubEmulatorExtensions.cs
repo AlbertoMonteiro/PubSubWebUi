@@ -1,4 +1,5 @@
 ﻿using Aspire.Hosting.ApplicationModel;
+using PubSubWebUi.Aspire.Hosting;
 
 namespace Aspire.Hosting;
 
@@ -18,8 +19,8 @@ public static class PubSubEmulatorExtensions
         var resource = new PubSubEmulatorResource(name);
 
         return builder.AddResource(resource)
-                     .WithImage(PubSubEmulatorContainerImageTags.Image)
-                     .WithImageTag(PubSubEmulatorContainerImageTags.Tag)
+                     .WithImage(PubSubEmulatorContainerImageTags.IMAGE)
+                     .WithImageTag(PubSubEmulatorContainerImageTags.TAG)
                      .WithHttpEndpoint(port: port, targetPort: 8681, name: PubSubEmulatorResource.PubSubEndpointName);
     }
 
@@ -54,7 +55,7 @@ public static class PubSubEmulatorExtensions
                                                                      string projectsIds = "test-project",
                                                                      Func<IResourceBuilder<ContainerResource>, IResourceBuilder<ContainerResource>>? configurer = null)
     {
-        var container = builder.ApplicationBuilder.AddContainer("pubsub-web-ui", PubSubEmulatorContainerImageTags.UiImage, PubSubEmulatorContainerImageTags.UiTag)
+        var container = builder.ApplicationBuilder.AddContainer("pubsub-web-ui", PubSubEmulatorContainerImageTags.UI_IMAGE, PubSubEmulatorContainerImageTags.UI_TAG)
                 .WithEndpoint(8080, targetPort: 8080, name: "pubsub-web-ui", scheme: "http")
                 .WithLifetime(ContainerLifetime.Persistent)
                 .WithEnvironment("GCP_PROJECT_IDS", projectsIds)
@@ -64,7 +65,7 @@ public static class PubSubEmulatorExtensions
         {
             container = configurer(container);
         }
-        
+
         container.WaitFor(builder);
 
         return builder;

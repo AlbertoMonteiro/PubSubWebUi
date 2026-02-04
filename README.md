@@ -42,7 +42,7 @@ The **PubSubWebUi.Aspire.Hosting** package provides seamless integration with .N
 # Run Pub/Sub Emulator
 docker run -d --name pubsub-emulator \
   -p 8681:8681 \
-  messagebird/gcloud-pubsub-emulator:latest \
+  thekevjames/gcloud-pubsub-emulator:latest \
   gcloud beta emulators pubsub start --host-port=0.0.0.0:8681
 
 # Run Web UI
@@ -64,7 +64,7 @@ version: '3.8'
 
 services:
   pubsub-emulator:
-    image: messagebird/gcloud-pubsub-emulator:latest
+    image: thekevjames/gcloud-pubsub-emulator:latest
     ports:
       - "8681:8681"
 
@@ -213,7 +213,7 @@ The solution consists of multiple projects:
 ## 🐳 Docker Support
 
 The package uses the following container images:
-- **Pub/Sub Emulator**: `messagebird/gcloud-pubsub-emulator:latest`
+- **Pub/Sub Emulator**: `thekevjames/gcloud-pubsub-emulator:latest`
 - **Web UI**: `ghcr.io/albertomonteiro/pubsubwebui:latest`
 
 ## 👨‍💻 Development
