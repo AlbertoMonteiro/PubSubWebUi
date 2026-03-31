@@ -55,11 +55,21 @@ public static class PubSubEmulatorExtensions
                                                                      string projectsIds = "test-project",
                                                                      Func<IResourceBuilder<ContainerResource>, IResourceBuilder<ContainerResource>>? configurer = null)
     {
+#if RELEASE
         var container = builder.ApplicationBuilder.AddContainer("pubsub-web-ui", PubSubEmulatorContainerImageTags.UI_IMAGE, PubSubEmulatorContainerImageTags.UI_TAG)
                 .WithEndpoint(8080, targetPort: 8080, name: "pubsub-web-ui", scheme: "http")
                 .WithLifetime(ContainerLifetime.Persistent)
                 .WithEnvironment("GCP_PROJECT_IDS", projectsIds)
                 .WithEnvironment(PUBSUB_VAR, builder.Resource.Endpoint);
+#else
+        var container = builder.ApplicationBuilder.AddDockerfile("pubsub-web-ui", Path.Combine(builder.ApplicationBuilder.AppHostDirectory, ".."), Path.Combine(builder.ApplicationBuilder.AppHostDirectory, "..", "Dockerfile"))
+                .WithEndpoint(8080, targetPort: 8080, name: "pubsub-web-ui", scheme: "http")
+                .WithLifetime(ContainerLifetime.Persistent)
+                .WithEnvironment("GCP_PROJECT_IDS", projectsIds)
+                .WithEnvironment(PUBSUB_VAR, builder.Resource.Endpoint);
+#endif
+
+        builder.WithChildRelationship(container);
 
         if (configurer is not null)
         {

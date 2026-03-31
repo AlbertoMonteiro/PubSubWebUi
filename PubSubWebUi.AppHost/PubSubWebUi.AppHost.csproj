@@ -1,6 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <Sdk Name="Aspire.AppHost.Sdk" Version="13.1.0" />
+<Project Sdk="Aspire.AppHost.Sdk/13.2.1">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,10 +7,6 @@
     <Nullable>enable</Nullable>
     <UserSecretsId>dc7c4fdf-51f2-4c08-94a2-1e525956c73e</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PubSubWebUi.Aspire.Hosting\PubSubWebUi.Aspire.Hosting.csproj" IsAspireProjectResource="false" />
