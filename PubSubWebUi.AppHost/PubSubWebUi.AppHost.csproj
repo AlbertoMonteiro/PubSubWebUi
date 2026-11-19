@@ -1,17 +1,20 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.2.1">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>dc7c4fdf-51f2-4c08-94a2-1e525956c73e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PubSubWebUi.Aspire.Hosting\PubSubWebUi.Aspire.Hosting.csproj" IsAspireProjectResource="false" />
-    <ProjectReference Include="..\PubSubWebUi.PlaygroundApi\PubSubWebUi.PlaygroundApi.csproj" />
-    <ProjectReference Include="..\PubSubWebUi\PubSubWebUi.csproj" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="17.0.0" />
+    <PackageReference Include="Aspire.Hosting.Dotnet" Version="17.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PubSubWebUi.Aspire.Hosting\PubSubWebUi.Aspire.Hosting.csproj" />
   </ItemGroup>
 
 </Project>

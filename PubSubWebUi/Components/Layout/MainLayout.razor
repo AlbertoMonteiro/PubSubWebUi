@@ -1,15 +1,15 @@
 ﻿@inherits LayoutComponentBase
 
 <FluentLayout>
-	<FluentHeader Style="background-color: var(--neutral-layer-2);color: white">
+	<FluentLayoutItem Area="LayoutArea.Header" Class="app-header">
 		<img src="pubsub.svg" />
 		<div style="padding: 0px 20px">
 			Google Cloud PubSub Emulator Web UI
 		</div>
-		<PubSubWebUi.Components.Blocks.CurrentProject/>
-	</FluentHeader>
-	<FluentStack Class="main" Orientation="Orientation.Horizontal" Width="100%">
-		<FluentAppBar Orientation="@(Orientation.Vertical)" Style="@(" background-color: var(--neutral-layer-2);")">
+		<PubSubWebUi.Components.Blocks.CurrentProject />
+	</FluentLayoutItem>
+	<FluentLayoutItem Area="LayoutArea.Navigation" Width="auto">
+		<FluentAppBar Orientation="Orientation.Vertical" Class="app-bar">
 			<FluentAppBarItem Href="/"
 							  Match="NavLinkMatch.All"
 							  IconRest="new Icons.Filled.Size24.Home()"
@@ -21,13 +21,17 @@
 							  IconActive="new Icons.Regular.Size24.List()"
 							  Text="Projects" />
 		</FluentAppBar>
-		<FluentBodyContent Class="body-content">
-			<div class="content">
-				@Body
-			</div>
-		</FluentBodyContent>
-	</FluentStack>
+	</FluentLayoutItem>
+	<FluentLayoutItem Area="LayoutArea.Content">
+		<div class="content">
+			@Body
+		</div>
+	</FluentLayoutItem>
 </FluentLayout>
+
+@* The layout is rendered statically (interactivity is per page), so the providers need their own interactive render mode
+   to share the circuit (and the scoped DialogService) with the interactive pages. *@
+<FluentProviders @rendermode="InteractiveServer" />
 
 <div id="blazor-error-ui" data-nosnippet>
 	An unhandled error has occurred.

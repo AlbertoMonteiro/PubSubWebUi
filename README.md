@@ -1,6 +1,6 @@
 # PubSubWebUi 💬
 
-PubSubWebUi is a modern web interface for managing Pub/Sub (Publisher/Subscriber) messaging systems. Built with .NET 10 and Blazor, it provides an intuitive user interface for managing topics and subscriptions in your messaging infrastructure.
+PubSubWebUi is a modern web interface for managing Pub/Sub (Publisher/Subscriber) messaging systems. Built with .NET 11 and Blazor, it provides an intuitive user interface for managing topics and subscriptions in your messaging infrastructure.
 
 ## 📦 NuGet Package - .NET Aspire Integration
 
@@ -32,7 +32,7 @@ The **PubSubWebUi.Aspire.Hosting** package provides seamless integration with .N
 
 - 🌐 A modern web browser
 - 🐳 Docker (for running the emulator containers)
-- 📦 .NET 8.0+ SDK (only if building from source)
+- 📦 .NET 11.0 SDK (only if building from source)
 
 ## 🚀 Deployment Options
 
@@ -103,7 +103,7 @@ If you're already using .NET Aspire, you can use our convenience package:
                       .WithWebUi("my-project,another-project");
 
    // Reference in your services
-   builder.AddProject<Projects.MyService>("my-service")
+   builder.AddDotnetProject("my-service", "../MyService/MyService.csproj")
           .WithReference(pubsub);
 
    builder.Build().Run();
@@ -145,6 +145,10 @@ builder.AddPubSubEmulator("pubsub-emulator")
    dotnet restore
    dotnet run --project PubSubWebUi.AppHost
    ```
+
+   If you have the [Aspire CLI](https://aspire.dev) installed, `aspire run` works as well.
+
+   > With Aspire 17, `dotnet run` on the AppHost hands off to the Aspire CLI, which provides the dashboard and orchestration. It uses the `aspire` CLI from your `PATH` when available; otherwise it runs the matching CLI version through `dnx` (part of the .NET SDK), so no global install is required.
 
 ## 🔧 Configuration
 
@@ -219,7 +223,7 @@ The package uses the following container images:
 ## 👨‍💻 Development
 
 This project uses:
-- ⚡ .NET 8.0, 9.0, and 10.0 support
+- ⚡ .NET 11 (the `PubSubWebUi.Aspire.Hosting` package targets .NET 10 and .NET 11, Aspire 17)
 - 🌐 Blazor for the web UI
 - 🔄 Modern C# features
 - 🏗️ Component-based architecture

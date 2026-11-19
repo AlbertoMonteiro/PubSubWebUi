@@ -19,11 +19,16 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient();
 
-builder.Services.AddFluentUIComponents();
+builder.Services.AddFluentUIComponents(config =>
+{
+    // Fluent UI v5 no longer applies a default 10px gap to FluentStack; keep the v4 look.
+    config.DefaultValues.For<FluentStack>().Set(p => p.HorizontalGap, "10px");
+    config.DefaultValues.For<FluentStack>().Set(p => p.VerticalGap, "10px");
+});
 
 builder.Services.AddSingleton<ProjectContext>();
 
-builder.Services.AddRefitClient<IPubSubService>()
+builder.Services.AddRefitGeneratedClient<IPubSubService>(PubSubJsonContext.Default)
     .ConfigureHttpClient(client => client.BaseAddress = emulatorHost);
 
 var app = builder.Build();

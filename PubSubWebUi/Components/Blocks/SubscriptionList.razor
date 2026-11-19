@@ -6,32 +6,41 @@
 @inject IDialogService DialogService
 
 <FluentStack Orientation="Orientation.Horizontal">
-    <FluentLabel Typo="Typography.H3"> Subscriptions </FluentLabel>
+    <FluentText As="TextTag.H3" Size="TextSize.Size600" Weight="TextWeight.Semibold"> Subscriptions </FluentText>
     <FluentSpacer />
     @if (_subscriptions is not null)
     {
-        <FluentButton IconEnd="new Icons.Regular.Size16.Add()" Title="Add new subscription" @onclick="AddNewSubscription" />
+        <FluentButton IconEnd="new Icons.Regular.Size16.Add()" Title="Add new subscription" OnClick="AddNewSubscription" />
     }
 </FluentStack>
 <br />
 @if (_loadingSubscriptions)
 {
-    <FluentProgressRing />
+    <FluentSpinner />
 }
 else if (_subscriptions is [])
 {
-    <FluentLabel Typo="Typography.Subject"> No subscription for topic <b>@SelectedTopic.Name</b></FluentLabel>
+    <FluentText As="TextTag.Paragraph" Size="TextSize.Size400" Weight="TextWeight.Semibold"> No subscription for topic <b>@SelectedTopic.Name</b></FluentText>
 }
 else if (_subscriptions != null)
 {
-    <FluentListbox Items="@_subscriptions"
-                   OptionValue="@(i => i.Name)"
-                   @bind-SelectedOption="SelectedSubscription">
+    <FluentListbox TOption="Subscription"
+                   TValue="Subscription"
+                   Items="@_subscriptions"
+                   OptionValueToString="@(s => s?.Name ?? "")"
+                   Width="100%"
+                   @bind-Value="SelectedSubscription">
         <OptionTemplate>
-            @context.Name
-            <FluentSpacer />
-            <FluentIcon Icon="Icons.Regular.Size16.MailMultiple" Slot="start" />
-            <FluentIcon Icon="Icons.Regular.Size16.Delete" Slot="end" Title="Delete subscription" OnClick="@(() => DeleteSubscription(context))"/>
+            <FluentStack Class="list-option-content" Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+                <FluentIcon Value="@(new Icons.Regular.Size16.MailMultiple())" />
+                <span>@context.Name</span>
+                <FluentSpacer />
+                <FluentIcon Value="@(new Icons.Regular.Size16.Delete())"
+                            Class="list-option-action"
+                            Title="Delete subscription"
+                            OnClick="@(() => DeleteSubscription(context))"
+                            OnClickStopPropagation="true" />
+            </FluentStack>
         </OptionTemplate>
     </FluentListbox>
 }
@@ -39,7 +48,7 @@ else if (_subscriptions != null)
 @code {
     [Parameter]
     public Subscription? SelectedSubscription
-    { 
+    {
         get;
         set
         {
@@ -89,27 +98,25 @@ else if (_subscriptions != null)
         var response = await PubSubService.DeleteSubscriptionAsync(ProjectContext.CurrentProject, subscription.SubscriptionName);
         if (response.IsSuccessful)
         {
-            var dialog = await DialogService.ShowSuccessAsync($"The subscription {subscription.SubscriptionName} is deleted");
+            if (SelectedSubscription == subscription)
+            {
+                SelectedSubscription = null;
+            }
+
+            await DialogService.ShowSuccessAsync($"The subscription {subscription.SubscriptionName} is deleted");
             await LoadSubscriptions();
         }
     }
 
     private async Task AddNewSubscription()
     {
-        DialogParameters parameters = new()
+        var result = await DialogService.ShowDialogAsync<NewSubscriptionDialog>(options =>
         {
-            Title = "Add a subscription",
-            PrimaryAction = "Add",
-            PrimaryActionEnabled = true,
-            SecondaryAction = "Cancel",
-            Width = "500px",
-            PreventScroll = true
-        };
+            options.Width = "500px";
+            options.Parameters.Add(nameof(NewSubscriptionDialog.Content), new NewSubscription { Name = "" });
+        });
 
-        IDialogReference dialog = await DialogService.ShowDialogAsync<NewSubscriptionDialog>(new NewSubscription { Name = "" }, parameters);
-        DialogResult? result = await dialog.Result;
-
-        if (!result.Cancelled && result.Data is NewSubscription subscription)
+        if (!result.Cancelled && result.GetValue<NewSubscription>() is { Name: { Length: > 0 } } subscription)
         {
             var request = string.IsNullOrWhiteSpace(subscription.PushEndpoint)
                 ? new NewSubscriptionRequest(SelectedTopic.Name)

@@ -23,9 +23,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
             dotnet-version: |
-              9.0.x
               10.0.x
-            include-prerelease: true
+              11.0.x
     
       - name: Restore dependencies
         run: dotnet restore

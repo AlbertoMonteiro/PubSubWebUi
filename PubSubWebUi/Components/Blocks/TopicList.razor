@@ -1,39 +1,40 @@
 ﻿@using PubSubWebUi.Components.Dialogs
 @using PubSubWebUi.Components.Models
 @using PubSubWebUi.Services
-@using PubSubWebUi.Components.Blocks
-@using System.Text
 @inject IPubSubService PubSubService
 @inject ProjectContext ProjectContext
 @inject IDialogService DialogService
 @rendermode InteractiveServer
 
 <FluentStack Orientation="Orientation.Horizontal">
-    <FluentLabel Typo="Typography.H3"> Topics </FluentLabel>
+    <FluentText As="TextTag.H3" Size="TextSize.Size600" Weight="TextWeight.Semibold"> Topics </FluentText>
     <FluentSpacer />
-    <FluentButton IconEnd="new Icons.Regular.Size16.Add()" Title="Add new topic" @onclick="AddNewTopic" />
+    <FluentButton IconEnd="new Icons.Regular.Size16.Add()" Title="Add new topic" OnClick="AddNewTopic" />
 </FluentStack>
 <br />
 
 @if (_topics == null)
 {
-    <FluentProgressRing />
+    <FluentSpinner />
 }
 else if (_topics is [])
 {
-    <FluentLabel Typo="Typography.Subject"> No topics in project <b>@ProjectContext.CurrentProject</b></FluentLabel>
+    <FluentText As="TextTag.Paragraph" Size="TextSize.Size400" Weight="TextWeight.Semibold"> No topics in project <b>@ProjectContext.CurrentProject</b></FluentText>
 }
 else
 {
-    <FluentListbox Items="@_topics"
-                   OptionValue="@(i => i.Name)"
-                   @onclick="@(async () => await TopicSelected.InvokeAsync(null))"
-                   @bind-SelectedOption=@SelectedTopic
-                   ValueChanged="@((e) => HandleTopicSelect(SelectedTopic))">
+    <FluentListbox TOption="Topic"
+                   TValue="Topic"
+                   Items="@_topics"
+                   OptionValueToString="@(t => t?.Name ?? "")"
+                   Width="100%"
+                   @bind-Value="SelectedTopic"
+                   @bind-Value:after="HandleTopicSelect">
         <OptionTemplate>
-            @context.Name
-            <FluentSpacer />
-            <FluentIcon Icon="Icons.Regular.Size16.PlayMultiple" Slot="start" />
+            <FluentStack Class="list-option-content" Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+                <FluentIcon Value="@(new Icons.Regular.Size16.PlayMultiple())" />
+                <span>@context.Name</span>
+            </FluentStack>
         </OptionTemplate>
     </FluentListbox>
 }
@@ -62,10 +63,11 @@ else
         StateHasChanged();
     }
 
-    private async Task HandleTopicSelect(Topic topic)
+    private async Task HandleTopicSelect()
     {
         try
         {
+            await TopicSelected.InvokeAsync(null);
             await SelectedTopicChanged.InvokeAsync(SelectedTopic);
             await InvokeAsync(StateHasChanged);
         }
@@ -77,22 +79,15 @@ else
 
     private async Task AddNewTopic()
     {
-        DialogParameters parameters = new()
+        var result = await DialogService.ShowDialogAsync<NewTopicDialog>(options =>
         {
-            Title = "Add a subscription",
-            PrimaryAction = "Add",
-            PrimaryActionEnabled = true,
-            SecondaryAction = "Cancel",
-            Width = "500px",
-            PreventScroll = true
-        };
+            options.Width = "500px";
+            options.Parameters.Add(nameof(NewTopicDialog.Content), new NewTopic { Name = "" });
+        });
 
-        IDialogReference dialog = await DialogService.ShowDialogAsync<NewTopicDialog>(new NewTopic { Name = "" }, parameters);
-        DialogResult? result = await dialog.Result;
-
-        if (result.Data is NewTopic theNewTopic)
+        if (!result.Cancelled && result.GetValue<NewTopic>() is { Name: { Length: > 0 } } theNewTopic)
         {
-            await PubSubService.CreateTopicAsync(ProjectContext.CurrentProject, theNewTopic!.Name);
+            await PubSubService.CreateTopicAsync(ProjectContext.CurrentProject, theNewTopic.Name);
             await LoadTopics();
         }
     }

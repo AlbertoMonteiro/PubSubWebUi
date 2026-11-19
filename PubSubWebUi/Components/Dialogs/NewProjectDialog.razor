@@ -1,18 +1,31 @@
-﻿@using PubSubWebUi.Components.Models
-@implements IDialogContentComponent<NewProjectDialog.DialogData>
+﻿@inherits FluentDialogInstance
 
-<FluentTextField @bind-Value="Content.ProjectName" style="width: 100%">Project name:</FluentTextField>
+<FluentDialogBody>
+    <FluentTextInput Label="Project name:" @bind-Value="Content.ProjectName" Width="100%" />
+</FluentDialogBody>
 
 @code {
     [Parameter]
-    public NewProjectDialog.DialogData Content { get; set; } = default!;
+    public NewProjectDialog.DialogData Content { get; set; } = new();
 
-    [CascadingParameter]
-    public FluentDialog? Dialog { get; set; }
-
-    private void ToggleDialogPrimaryActionButton(bool enable)
+    protected override void OnInitializeDialog(DialogOptionsHeader header, DialogOptionsFooter footer)
     {
-        Dialog!.TogglePrimaryActionButton(enable);
+        header.Title = "Add a project";
+        footer.PrimaryAction.Label = "Add";
+        footer.SecondaryAction.Label = "Cancel";
+        footer.SecondaryAction.Visible = true;
+    }
+
+    protected override async Task OnActionClickedAsync(bool primary)
+    {
+        if (primary)
+        {
+            await DialogInstance.CloseAsync(Content);
+        }
+        else
+        {
+            await DialogInstance.CancelAsync();
+        }
     }
 
     public class DialogData

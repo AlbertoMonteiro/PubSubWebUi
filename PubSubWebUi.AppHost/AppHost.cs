@@ -13,13 +13,13 @@ builder
     .WaitFor(pubsubEmulator);
 
 builder
-    .AddProject<Projects.PubSubWebUi>("pubsubwebui")
+    .AddDotnetProject("pubsubwebui", "../PubSubWebUi/PubSubWebUi.csproj")
     .WithEnvironment("GCP_PROJECT_IDS", "test-project")
     .WaitFor(pubsubEmulator)
     .WithEnvironment(pubsubEmulator);
 
 builder
-    .AddProject<Projects.PubSubWebUi_PlaygroundApi>("playground")
+    .AddDotnetProject("playground", "../PubSubWebUi.PlaygroundApi/PubSubWebUi.PlaygroundApi.csproj")
     .WaitFor(pubsubEmulator)
     .WithEnvironment(pubsubEmulator);
 
