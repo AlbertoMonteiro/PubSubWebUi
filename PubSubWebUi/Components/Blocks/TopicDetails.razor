@@ -7,23 +7,23 @@
 @inject ProjectContext ProjectContext
 @rendermode InteractiveServer
 
-<FluentGrid>
-    <FluentGridItem xs="6">
-        <FluentLabel Typo="Typography.H3">
+<FluentGrid Spacing="3">
+    <FluentGridItem Xs="6">
+        <FluentText As="TextTag.H3" Size="TextSize.Size600" Weight="TextWeight.Semibold">
             Publish Message to topic: @SelectedTopic.Name
-        </FluentLabel>
+        </FluentText>
     </FluentGridItem>
-    <FluentGridItem xs="3">
+    <FluentGridItem Xs="3">
         <div style="display: flex;justify-content: center;">
-            <FluentButton IconStart="new Icons.Regular.Size16.DocumentSettings()" Appearance="Appearance.Lightweight">Edit attributes (0)</FluentButton>
+            <FluentButton IconStart="new Icons.Regular.Size16.DocumentSettings()" Appearance="ButtonAppearance.Transparent">Edit attributes (0)</FluentButton>
         </div>
     </FluentGridItem>
-    <FluentGridItem xs="3">
+    <FluentGridItem Xs="3">
         <div style="display: flex;justify-content: end;">
-            <FluentButton Loading="_publishingMessage" OnClick="PublishMessage" IconStart="new Icons.Regular.Size16.Send()" Appearance="Appearance.Accent">Publish message</FluentButton>
+            <FluentButton Loading="_publishingMessage" OnClick="PublishMessage" IconStart="new Icons.Regular.Size16.Send()" Appearance="ButtonAppearance.Primary">Publish message</FluentButton>
         </div>
     </FluentGridItem>
-    <FluentGridItem xs="12">
+    <FluentGridItem Xs="12">
         <StandaloneCodeEditor @ref="_editor" Id="my-editor-id" CssClass="my-editor-class" ConstructionOptions="@(x => new StandaloneEditorConstructionOptions() { Language = "json" })" />
     </FluentGridItem>
 </FluentGrid>

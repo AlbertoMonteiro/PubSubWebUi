@@ -11,18 +11,17 @@
 @rendermode InteractiveServer
 
 <PageTitle>PubSub Explorer</PageTitle>
-<FluentDialogProvider />
 
 <div class="content-container">
-    <FluentGrid>
-        <FluentGridItem sm="6" xs="12">
+    <FluentGrid Spacing="3">
+        <FluentGridItem Sm="6" Xs="12">
             <TopicList @bind-SelectedTopic="SelectedTopic" TopicSelected="@(() => SelectedSubscription = null)" />
         </FluentGridItem>
-        <FluentGridItem sm="6" xs="12">
+        <FluentGridItem Sm="6" Xs="12">
             <SubscriptionList SelectedTopic="SelectedTopic"
                               @bind-SelectedSubscription="SelectedSubscription" />
         </FluentGridItem>
-        <FluentGridItem sm="12" xs="12">
+        <FluentGridItem Sm="12" Xs="12">
             @if (SelectedSubscription is not null)
             {
                 <SubscriptionDetails SelectedSubscription="SelectedSubscription" />

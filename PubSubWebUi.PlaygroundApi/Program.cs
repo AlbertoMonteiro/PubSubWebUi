@@ -10,7 +10,7 @@ builder.AddServiceDefaults();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddRefitClient<IPubSubService>()
+builder.Services.AddRefitGeneratedClient<IPubSubService>(PubSubJsonContext.Default)
     .ConfigureHttpClient(client => client.BaseAddress = emulatorHost);
 
 var app = builder.Build();

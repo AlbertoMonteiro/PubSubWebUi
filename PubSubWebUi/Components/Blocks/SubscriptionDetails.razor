@@ -2,37 +2,37 @@
 @inject IPubSubService PubSubService
 @inject ProjectContext ProjectContext
 
-<FluentGrid>
-    <FluentGridItem xs="12" sm="12">
-        <FluentLabel Typo="Typography.H3"> Subscription details </FluentLabel>
+<FluentGrid Spacing="3">
+    <FluentGridItem Xs="12" Sm="12">
+        <FluentText As="TextTag.H3" Size="TextSize.Size600" Weight="TextWeight.Semibold"> Subscription details </FluentText>
     </FluentGridItem>
-    <FluentGridItem xs="12" sm="6">
+    <FluentGridItem Xs="12" Sm="6">
         <FluentStack Orientation="Orientation.Vertical">
-            <FluentLabel>path: @SelectedSubscription.Name</FluentLabel>
-            <FluentLabel>topic: @SelectedSubscription.Topic</FluentLabel>
-            <FluentLabel>type: @(SelectedSubscription.PushConfig?.PushEndpoint is null ? "PULL" : "PUSH")</FluentLabel>
+            <FluentText>path: @SelectedSubscription.Name</FluentText>
+            <FluentText>topic: @SelectedSubscription.Topic</FluentText>
+            <FluentText>type: @(SelectedSubscription.PushConfig?.PushEndpoint is null ? "PULL" : "PUSH")</FluentText>
             @if (SelectedSubscription.PushConfig?.PushEndpoint is not null)
             {
-                <FluentLabel>push endpoint: @SelectedSubscription.PushConfig.PushEndpoint</FluentLabel>
+                <FluentText>push endpoint: @SelectedSubscription.PushConfig.PushEndpoint</FluentText>
             }
         </FluentStack>
     </FluentGridItem>
-    <FluentGridItem xs="12" sm="6">
+    <FluentGridItem Xs="12" Sm="6">
         <div style="display: flex;justify-content: center;">
-            <FluentButton Loading="_loadingMessages" OnClick="LoadMessages" IconStart="new Icons.Regular.Size16.ArrowDownload()" Appearance="Appearance.Accent">Pull messages</FluentButton>
+            <FluentButton Loading="_loadingMessages" OnClick="LoadMessages" IconStart="new Icons.Regular.Size16.ArrowDownload()" Appearance="ButtonAppearance.Primary">Pull messages</FluentButton>
         </div>
     </FluentGridItem>
-    <FluentGridItem xs="12" sm="12">
+    <FluentGridItem Xs="12" Sm="12">
         Messages received: @_receivedMessages.Count()
     </FluentGridItem>
-    <FluentGridItem xs="12" sm="12">
+    <FluentGridItem Xs="12" Sm="12">
         <FluentDataGrid Items="@_receivedMessages" AutoFit=true RowSize="DataGridRowSize.Medium">
             <PropertyColumn Property="@(x => x.Message.MessageId)"/>
             <PropertyColumn Property="@(x => x.Message.PublishTime.Value.ToLocalTime())" Title="Timestamp" />
             <PropertyColumn Property="@(x => x.Message.DecodedData)" Style="font-family: monospace" />
             <PropertyColumn Property="@(x => x.Message.Attributes)" />
             <TemplateColumn Title="Ack">
-                <FluentButton Loading="@context.IsAcking" OnClick="@(() => AckMessage(context))" IconStart="new Icons.Regular.Size12.Checkmark()" Appearance="Appearance.Accent">Ack</FluentButton>
+                <FluentButton Loading="@context.IsAcking" OnClick="@(() => AckMessage(context))" IconStart="new Icons.Regular.Size12.Checkmark()" Appearance="ButtonAppearance.Primary">Ack</FluentButton>
             </TemplateColumn>
         </FluentDataGrid>
     </FluentGridItem>

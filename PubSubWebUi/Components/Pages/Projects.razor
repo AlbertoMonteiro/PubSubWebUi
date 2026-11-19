@@ -1,28 +1,26 @@
 ﻿@page "/projects"
 @using PubSubWebUi.Components.Dialogs
-@using PubSubWebUi.Components.Layout
 @using PubSubWebUi.Services
 @inject ProjectContext ctx
 @inject IDialogService DialogService
 @rendermode InteractiveServer
 
-<FluentDialogProvider />
-<FluentLabel Typo="Typography.H3"> Projects </FluentLabel>
+<FluentText As="TextTag.H3" Size="TextSize.Size600" Weight="TextWeight.Semibold"> Projects </FluentText>
 
-<FluentStack>
+<FluentStack Wrap="true">
     @foreach (var item in ctx.AvailableProjects)
     {
-        <FluentCard Width="400px" MinimalStyle=true Style="display: flex;justify-content: center;cursor: pointer" @onclick="@(() => SelectedProject(item))">
-            <FluentLabel Typo="Typography.EmailHeader"> @item </FluentLabel>
+        <FluentCard Width="400px" Appearance="CardAppearance.Subtle" Style="display: flex;justify-content: center;cursor: pointer" OnClick="@(() => SelectedProject(item))">
+            <FluentText Size="TextSize.Size500" Weight="TextWeight.Semibold"> @item </FluentText>
         </FluentCard>
     }
 
-    <FluentCard Width="400px" MinimalStyle=true Style="cursor: pointer" @onclick="@(() => AddNewProject())">
+    <FluentCard Width="400px" Appearance="CardAppearance.Subtle" Style="cursor: pointer" OnClick="AddNewProject">
         <div style="display: flex;justify-content: center;">
-            <FluentButton IconStart="@(new Icons.Regular.Size24.Add())" OnClick="AddNewProject" />
+            <FluentIcon Value="@(new Icons.Regular.Size24.Add())" />
         </div>
         <div style="display: flex;justify-content: center;">
-            <FluentLabel Typo="Typography.H4"> Attach new project </FluentLabel>
+            <FluentText As="TextTag.H4" Size="TextSize.Size500" Weight="TextWeight.Semibold"> Attach new project </FluentText>
         </div>
     </FluentCard>
 </FluentStack>
@@ -36,21 +34,14 @@
 
     public async Task AddNewProject()
     {
-        DialogParameters parameters = new()
+        var result = await DialogService.ShowDialogAsync<NewProjectDialog>(options =>
         {
-            Title = "Add a project",
-            PrimaryAction = "Add",
-            PrimaryActionEnabled = true,
-            SecondaryAction = "Cancel",
-            Width = "500px",
-            PreventScroll = true,
-            Modal = true
-        };
+            options.Width = "500px";
+            options.Modal = true;
+            options.Parameters.Add(nameof(NewProjectDialog.Content), new NewProjectDialog.DialogData());
+        });
 
-        IDialogReference dialog = await DialogService.ShowDialogAsync<NewProjectDialog>(new NewProjectDialog.DialogData(), parameters);
-        DialogResult? result = await dialog.Result;
-
-        if (!result.Cancelled && result.Data is NewProjectDialog.DialogData { ProjectName: { } project })
+        if (!result.Cancelled && result.GetValue<NewProjectDialog.DialogData>() is { ProjectName: { Length: > 0 } project })
         {
             ctx.AddProject(project);
         }

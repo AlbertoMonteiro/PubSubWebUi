@@ -1,17 +1,31 @@
 ﻿@using PubSubWebUi.Components.Models
-@implements IDialogContentComponent<NewTopic>
+@inherits FluentDialogInstance
 
-<FluentTextField @bind-Value="@Content.Name" style="width: 100%">Topic name:</FluentTextField>
+<FluentDialogBody>
+    <FluentTextInput Label="Topic name:" @bind-Value="Content.Name" Width="100%" />
+</FluentDialogBody>
 
 @code {
     [Parameter]
-    public NewTopic Content { get; set; } = default!;
+    public NewTopic Content { get; set; } = new() { Name = "" };
 
-    [CascadingParameter]
-    public FluentDialog? Dialog { get; set; }
-
-    private void ToggleDialogPrimaryActionButton(bool enable)
+    protected override void OnInitializeDialog(DialogOptionsHeader header, DialogOptionsFooter footer)
     {
-        Dialog!.TogglePrimaryActionButton(enable);
+        header.Title = "Add a topic";
+        footer.PrimaryAction.Label = "Add";
+        footer.SecondaryAction.Label = "Cancel";
+        footer.SecondaryAction.Visible = true;
+    }
+
+    protected override async Task OnActionClickedAsync(bool primary)
+    {
+        if (primary)
+        {
+            await DialogInstance.CloseAsync(Content);
+        }
+        else
+        {
+            await DialogInstance.CancelAsync();
+        }
     }
 }
