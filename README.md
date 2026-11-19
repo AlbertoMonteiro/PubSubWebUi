@@ -32,7 +32,7 @@ The **PubSubWebUi.Aspire.Hosting** package provides seamless integration with .N
 
 - 🌐 A modern web browser
 - 🐳 Docker (for running the emulator containers)
-- 📦 .NET 11.0 SDK and Aspire CLI 17 (only if building from source)
+- 📦 .NET 11.0 SDK (only if building from source)
 
 ## 🚀 Deployment Options
 
@@ -143,10 +143,12 @@ builder.AddPubSubEmulator("pubsub-emulator")
    git clone <repository-url>
    cd PubSubWebUi
    dotnet restore
-   aspire run
+   dotnet run --project PubSubWebUi.AppHost
    ```
 
-   > The AppHost uses `Microsoft.NET.Sdk` with the `Aspire.Hosting.AppHost` package (Aspire 17), so it is started through the [Aspire CLI](https://aspire.dev), which provides the dashboard and orchestration dependencies.
+   If you have the [Aspire CLI](https://aspire.dev) installed, `aspire run` works as well.
+
+   > With Aspire 17, `dotnet run` on the AppHost hands off to the Aspire CLI, which provides the dashboard and orchestration. It uses the `aspire` CLI from your `PATH` when available; otherwise it runs the matching CLI version through `dnx` (part of the .NET SDK), so no global install is required.
 
 ## 🔧 Configuration
 
